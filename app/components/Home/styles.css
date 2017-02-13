@@ -1,0 +1,11 @@
+.container {
+  composes: centeredContainer from 'styles/styles.css'
+}
+
+.title {
+  composes: largeHeader from 'styles/styles.css'
+}
+
+.tagline {
+  composes: subHeader from 'styles/styles.css'
+}

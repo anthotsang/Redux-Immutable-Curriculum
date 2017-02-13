@@ -1,0 +1,12 @@
+.header {
+  composes: subHeader from 'styles/styles.css';
+  color: inherit;
+}
+
+.subHeader {
+  composes: subHeader from 'styles/styles.css';
+}
+
+.container {
+  composes: centeredContainer from 'styles/styles.css';
+}

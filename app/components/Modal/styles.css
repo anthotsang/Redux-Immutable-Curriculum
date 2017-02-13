@@ -1,0 +1,61 @@
+.modalTitle {
+  background: #fff;
+  padding: 11px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+  composes: blueText from 'styles/styles.css';
+  font-size: 23px;
+}
+
+.smallInputContainer {
+  display: flex;
+  height: 40px;
+  margin: 10px;
+}
+
+.largeInputContainer {
+  display: flex;
+  height: 110px;
+  margin: 10px;
+}
+
+.input {
+  flex: 1;
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-size: 18px;
+  resize: none;
+}
+
+.divider {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  font-size: 23px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.darkBtn {
+  composes: darkBtn from 'styles/styles.css';
+  text-decoration: none;
+}
+
+.submitBtn {
+  composes: darkBtn;
+  margin: 0px auto;
+  width: 150px;
+  text-align: center;
+  display: block;
+}
+
+.submitBtn:disabled {
+  background: #C6C6C6;
+  border: 1px solid #C6C6C6;
+}
