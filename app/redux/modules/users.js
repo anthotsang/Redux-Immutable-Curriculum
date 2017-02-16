@@ -62,11 +62,11 @@ function fetchingUserFailure (error) {
   }
 }
 
-export function fetchingUserSuccess (uid, user, timestamp) {
+export function fetchingUserSuccess (uid, userInfo, timestamp) {
   return {
     type: FETCHING_USER_SUCCESS,
     uid,
-    user,
+    userInfo,
     timestamp,
   }
 }
@@ -90,6 +90,7 @@ export function fetchAndAddUsersVotes (uid) {
 
 export function fetchAuthandHandleUser () {
   return function (dispatch) {
+    console.log('fetching user')
     dispatch(fetchingUser())
     return auth()
       .then(({user, credential}) => {
@@ -97,13 +98,20 @@ export function fetchAuthandHandleUser () {
         dispatch(fetchAndAddUsersVotes(user.uid))
         return {
           uid: user.uid,
-          user: userInfo,
-          timestamp: Date.now()
+          userInfo,
+          timestamp: Date.now(),
         }
       })
-      .then(({uid, user, timestamp}) => dispatch(fetchingUserSuccess(uid, user, timestamp)))
-      .then(({user}) => saveUser(user))
-      .then((user) => dispatch(authUser(user.uid)))
+      .then(({uid, userInfo, timestamp}) => {
+        const authUserPromise = dispatch(authUser(uid))
+        return {
+          uid,
+          userInfo,
+          timestamp,
+        }
+      })
+      .then(({uid, userInfo, timestamp}) => dispatch(fetchingUserSuccess(uid, userInfo, timestamp)))
+      .then(({userInfo}) => saveUser(userInfo))
       .catch((error) => dispatch(fetchingUserFailure(error)))
   }
 }
@@ -122,7 +130,7 @@ function user (state = initialUserState, action) {
     case FETCHING_USER_SUCCESS :
       return {
         ...state,
-        info: action.user,
+        info: action.userInfo,
         lastUpdated: action.timestamp,
       }
     default :
@@ -133,6 +141,7 @@ function user (state = initialUserState, action) {
 const initialState = {
   isAuthed: false,
   isFetching: true,
+  loginChecked: false,
   error: '',
   authedId: '',
 }
@@ -144,6 +153,7 @@ export default function users (state = initialState, action)
       return {
         ...state,
         isFetching: true,
+        loginChecked: true,
         error: ''
       }
     case REMOVE_FETCHING_USER:
@@ -155,6 +165,7 @@ export default function users (state = initialState, action)
       return {
         ...state,
         isAuthed: true,
+        loginChecked: true,
         authedId: action.uid
       }
     case UNAUTH_USER:
@@ -167,6 +178,7 @@ export default function users (state = initialState, action)
       return {
         ...state,
         isFetching: false,
+        loginChecked: true,
         error: action.error,
       }
     case FETCHING_USER_SUCCESS:
@@ -174,11 +186,13 @@ export default function users (state = initialState, action)
         ? {
           ...state,
           isFetching: false,
+          loginChecked: true,
           error: '',
         }
         : {
           ...state,
           isFetching: false,
+          loginChecked: true,
           error: '',
           [action.uid]: user(state[action.uid], action),
         }

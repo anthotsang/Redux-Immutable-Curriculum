@@ -11,6 +11,7 @@ const MainContainer = React.createClass({
   propTypes: {
     isAuthed: PropTypes.bool.isRequired,
     isFetching: PropTypes.bool.isRequired,
+    loginChecked: PropTypes.bool.isRequired,
     authUser: PropTypes.func.isRequired,
     fetchingUserSuccess: PropTypes.func.isRequired,
     removeFetchingUser: PropTypes.func.isRequired,
@@ -20,17 +21,20 @@ const MainContainer = React.createClass({
     router: PropTypes.object.isRequired
   },
   componentDidMount () {
-    firebaseAuth().onAuthStateChanged((user) => {
-      if (user && !this.props.isAuthed) {
-        const userInfo = formatUserInfo(user.uid, user.providerData[0].displayName)
-        this.props.authUser(user.uid)
-        this.props.fetchAndAddUsersVotes(user.uid)
-          .then(() => this.props.fetchingUserSuccess(user.uid, userInfo, Date.now()))
-          .then(() => {
-            if (this.props.location.pathname == '/' || this.props.location.pathname == 'auth' || this.props.location.pathname == '/logout') {
-              this.context.router.replace('results')
-            }
-          })
+    const unsubscribe = firebaseAuth().onAuthStateChanged((user) => {
+      unsubscribe();
+      if (user) {
+        if (this.props.loginChecked == false && this.props.isAuthed === false) {
+          const userInfo = formatUserInfo(user.uid, user.providerData[0].displayName)
+          this.props.authUser(user.uid)
+          this.props.fetchAndAddUsersVotes(user.uid)
+            .then(() => this.props.fetchingUserSuccess(user.uid, userInfo, Date.now()))
+            .then(() => {
+              if (this.props.location.pathname == '/' || this.props.location.pathname == '/auth' || this.props.location.pathname == '/logout') {
+                this.context.router.replace('results')
+              }
+            })
+        }
       } else {
         this.props.removeFetchingUser()
       }
@@ -52,6 +56,7 @@ function mapStateToProps(state) {
   return {
     isAuthed: state.users.isAuthed,
     isFetching: state.users.isFetching,
+    loginChecked: state.users.loginChecked,
   }
 }
 

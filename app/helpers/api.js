@@ -2,7 +2,7 @@ import { ref } from 'config/constants'
 
 export function saveUser (user) {
   return ref.child(`users/${user.uid}`)
-    .set(user)
+    .update(user)
     .then(() => user)
 }
 
